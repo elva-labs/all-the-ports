@@ -23,7 +23,7 @@ Native Swift/SwiftUI. No Electron, no runtime, ~2.5 MB.
 brew install --cask kabba/tap/all-the-ports
 ```
 
-Or grab the notarized zip from the [latest release](https://github.com/Kabba/all-the-ports/releases/latest).
+Or grab the zip from the [latest release](https://github.com/Kabba/all-the-ports/releases/latest) — releases are signed and notarized (Developer ID), so there are no Gatekeeper warnings either way.
 
 ### Build from source
 
@@ -37,14 +37,6 @@ make run          # builds and launches it
 ```
 
 Copy `build/all the ports.app` to `/Applications` if you like it.
-
-### Homebrew
-
-```sh
-brew install --cask kabba/tap/all-the-ports
-```
-
-Releases are signed and notarized (Developer ID), so no Gatekeeper warnings.
 
 ## How it works
 
