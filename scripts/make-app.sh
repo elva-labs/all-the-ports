@@ -17,26 +17,34 @@ OUT="${1:-build}"
 APP="$OUT/all the ports.app"
 SIGN_IDENTITY="${SIGN_IDENTITY:--}"
 
-# SwiftUI macros need the full Xcode toolchain; if only the Command Line
-# Tools are selected but Xcode is installed, point at Xcode for this build.
+# xcodebuild (not `swift build`) is required here: the Bundle.module accessor
+# SwiftPM generates for `swift build` only looks in the app bundle ROOT and in
+# the build machine's absolute .build path, so dependency resource bundles
+# (e.g. KeyboardShortcuts localizations) trap at runtime on any other machine
+# — and codesign rejects bundles placed at the app root ("unsealed contents").
+# Xcode's generated accessor searches Contents/Resources, where we copy them.
 if [ -z "${DEVELOPER_DIR:-}" ] \
   && ! xcode-select -p | grep -q "Xcode.app" \
   && [ -d "/Applications/Xcode.app/Contents/Developer" ]; then
   export DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer"
 fi
 
-swift build -c release
+PRODUCTS=".build/xcodebuild/Build/Products/Release"
+xcodebuild -scheme AllThePorts -configuration Release \
+  -destination "generic/platform=macOS" \
+  -derivedDataPath .build/xcodebuild \
+  CODE_SIGNING_ALLOWED=NO build
 
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
-cp ".build/release/AllThePorts" "$APP/Contents/MacOS/AllThePorts"
+cp "$PRODUCTS/AllThePorts" "$APP/Contents/MacOS/AllThePorts"
 cp "Resources/Info.plist" "$APP/Contents/Info.plist"
 
-# SwiftPM dependencies with resources (e.g. KeyboardShortcuts localizations)
-# emit .bundle directories next to the binary; Bundle.module looks for them
-# in Contents/Resources and traps if they're missing.
-for bundle in .build/release/*.bundle; do
+# SwiftPM dependencies with resources emit .bundle directories next to the
+# binary; the Xcode-generated Bundle.module accessor finds them in
+# Contents/Resources and traps if they're missing.
+for bundle in "$PRODUCTS"/*.bundle; do
   [ -d "$bundle" ] || continue
   cp -R "$bundle" "$APP/Contents/Resources/"
 done
