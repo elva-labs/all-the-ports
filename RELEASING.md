@@ -41,11 +41,11 @@ keychain of the Mac that generated the CSR. To export:
 From a terminal in this repo:
 
 ```sh
-base64 -i DeveloperID.p12 | gh secret set MACOS_CERT_P12
-gh secret set MACOS_CERT_PASSWORD        # paste the .p12 password
-gh secret set APPLE_API_KEY_P8 < AuthKey_XXXXXXXXXX.p8
-gh secret set APPLE_API_KEY_ID           # paste the Key ID
-gh secret set APPLE_API_ISSUER_ID        # paste the Issuer ID
+base64 -i DeveloperID.p12 | gh secret set MACOS_CERTIFICATE
+gh secret set MACOS_CERTIFICATE_PASSWORD        # paste the .p12 password
+gh secret set NOTARY_KEY < AuthKey_XXXXXXXXXX.p8
+gh secret set NOTARY_KEY_ID           # paste the Key ID
+gh secret set NOTARY_ISSUER_ID        # paste the Issuer ID
 ```
 
 Then delete any exported key material from disk.
