@@ -59,4 +59,4 @@ Started as a [Glaze](https://glaze.app) (Electron/React) prototype, then ported 
 
 ## License
 
-[MIT](LICENSE) © Andreas Persson
+[MIT](LICENSE) © Elva Group AB

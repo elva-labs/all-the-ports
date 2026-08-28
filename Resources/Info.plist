@@ -11,7 +11,7 @@
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.kabba.all-the-ports</string>
+	<string>com.elva-labs.all-the-ports</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -29,6 +29,6 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2026 Andreas Persson. MIT License.</string>
+	<string>Copyright © 2026 Elva Group AB. MIT License.</string>
 </dict>
 </plist>
