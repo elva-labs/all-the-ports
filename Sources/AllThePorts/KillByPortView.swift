@@ -1,14 +1,19 @@
 import PortsCore
 import SwiftUI
 
-/// The ⌘K sheet: type a port, kill whatever listens on it.
+/// The ⌘K overlay: type a port, kill whatever listens on it.
+///
+/// Rendered as an in-view overlay rather than a `.sheet` on purpose — sheets
+/// presented inside an NSPopover make AppKit resize and displace the popover
+/// window, which then reopens misaligned.
+///
 /// If several processes share the port (SO_REUSEPORT, split v4/v6 listeners)
 /// every one of them is signalled and the outcome reported honestly.
 struct KillByPortView: View {
     let notify: (String, Bool) -> Void
     let onKilled: () -> Void
+    let onClose: () -> Void
 
-    @Environment(\.dismiss) private var dismiss
     @State private var input = ""
     @State private var busy = false
     @State private var fieldError: String?
@@ -23,44 +28,53 @@ struct KillByPortView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Kill process by port")
-                .font(.headline)
-            Text("Enter the port number to terminate its process.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+        ZStack(alignment: .top) {
+            Color.black.opacity(0.3)
+                .onTapGesture { onClose() }
 
-            TextField("e.g. 3000", text: $input)
-                .textFieldStyle(.roundedBorder)
-                .font(.body.monospacedDigit())
-                .focused($fieldFocused)
-                .onSubmit(submit)
-
-            if let fieldError {
-                Text(fieldError)
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Kill process by port")
+                    .font(.headline)
+                Text("Enter the port number to terminate its process.")
                     .font(.caption)
-                    .foregroundStyle(.red)
-            }
+                    .foregroundStyle(.secondary)
 
-            HStack {
-                Spacer()
-                Button("Cancel") { dismiss() }
-                    .keyboardShortcut(.cancelAction)
-                    .disabled(busy)
-                Button(role: .destructive, action: submit) {
-                    if busy {
-                        ProgressView().controlSize(.small)
-                    } else {
-                        Text("Kill")
-                    }
+                TextField("e.g. 3000", text: $input)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.body.monospacedDigit())
+                    .focused($fieldFocused)
+                    .onSubmit(submit)
+
+                if let fieldError {
+                    Text(fieldError)
+                        .font(.caption)
+                        .foregroundStyle(.red)
                 }
-                .keyboardShortcut(.defaultAction)
-                .tint(.red)
-                .disabled(busy || parsedPort == nil)
+
+                HStack {
+                    Spacer()
+                    Button("Cancel") { onClose() }
+                        .keyboardShortcut(.cancelAction)
+                        .disabled(busy)
+                    Button(role: .destructive, action: submit) {
+                        if busy {
+                            ProgressView().controlSize(.small)
+                        } else {
+                            Text("Kill")
+                        }
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .tint(.red)
+                    .disabled(busy || parsedPort == nil)
+                }
             }
+            .padding(16)
+            .frame(width: 300)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+            .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(.quaternary))
+            .shadow(radius: 16, y: 4)
+            .padding(.top, 80)
         }
-        .padding(16)
-        .frame(width: 300)
         .onAppear { fieldFocused = true }
     }
 
@@ -82,7 +96,7 @@ struct KillByPortView: View {
                         ? "Killed \(names) on port \(port)"
                         : "Killed \(killed.count) processes on port \(port) (\(names))", false)
                     onKilled()
-                    dismiss()
+                    onClose()
                 } else {
                     let detail = failed.compactMap(\.message).joined(separator: " ")
                     fieldError = killed.isEmpty

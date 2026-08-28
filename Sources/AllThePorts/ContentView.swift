@@ -46,12 +46,16 @@ struct ContentView: View {
             footer
         }
         .frame(width: 400, height: 540)
-        .overlay(alignment: .bottom) { noticeBanner }
-        .sheet(isPresented: $showKillByPort) {
-            KillByPortView(notify: notify) {
-                Task { await refresh() }
+        .overlay {
+            if showKillByPort {
+                KillByPortView(
+                    notify: notify,
+                    onKilled: { Task { await refresh() } },
+                    onClose: { showKillByPort = false }
+                )
             }
         }
+        .overlay(alignment: .bottom) { noticeBanner }
         .task { await pollWhileVisible() }
         .onDisappear {
             // The popover hides on outside clicks; a half-typed kill dialog

@@ -2,7 +2,7 @@ import AppKit
 import KeyboardShortcuts
 import SwiftUI
 
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private var statusItem: NSStatusItem?
     private let popover = NSPopover()
     private var settingsWindow: NSWindow?
@@ -21,6 +21,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         popover.behavior = .transient // closes on outside click, like a system popover
         popover.animates = false
+        popover.contentSize = Self.popoverSize
+        popover.delegate = self
         popover.contentViewController = NSHostingController(rootView: ContentView(
             openSettings: { [weak self] in self?.openSettings() },
             closePopover: { [weak self] in self?.closePopover() }
@@ -31,7 +33,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    private static let popoverSize = NSSize(width: 400, height: 540)
+
     // MARK: - Popover
+
+    /// AppKit can leave the popover window resized or displaced (e.g. after
+    /// system-driven repositioning); re-assert our size once it closes so the
+    /// next open is always anchored cleanly under the status item.
+    func popoverDidClose(_ notification: Notification) {
+        popover.contentSize = Self.popoverSize
+    }
 
     @objc func togglePopover() {
         if popover.isShown {
