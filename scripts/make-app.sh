@@ -32,6 +32,14 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
 cp ".build/release/AllThePorts" "$APP/Contents/MacOS/AllThePorts"
 cp "Resources/Info.plist" "$APP/Contents/Info.plist"
+
+# SwiftPM dependencies with resources (e.g. KeyboardShortcuts localizations)
+# emit .bundle directories next to the binary; Bundle.module looks for them
+# in Contents/Resources and traps if they're missing.
+for bundle in .build/release/*.bundle; do
+  [ -d "$bundle" ] || continue
+  cp -R "$bundle" "$APP/Contents/Resources/"
+done
 if [ -f "Resources/AppIcon.icns" ]; then
   cp "Resources/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 fi
