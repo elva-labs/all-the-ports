@@ -20,17 +20,17 @@ Native Swift/SwiftUI. No Electron, no runtime, ~2.5 MB.
 ### Homebrew (recommended)
 
 ```sh
-brew install --cask kabba/tap/all-the-ports
+brew install --cask elva-labs/elva/all-the-ports
 ```
 
-Or grab the zip from the [latest release](https://github.com/Kabba/all-the-ports/releases/latest) — releases are signed and notarized (Developer ID), so there are no Gatekeeper warnings either way.
+Or grab the zip from the [latest release](https://github.com/elva-labs/all-the-ports/releases/latest) — releases are signed and notarized (Developer ID), so there are no Gatekeeper warnings either way.
 
 ### Build from source
 
 Requires macOS 13+ and Xcode 15+ (Swift 5.10).
 
 ```sh
-git clone https://github.com/Kabba/all-the-ports.git
+git clone https://github.com/elva-labs/all-the-ports.git
 cd all-the-ports
 make app          # builds build/all the ports.app
 make run          # builds and launches it
